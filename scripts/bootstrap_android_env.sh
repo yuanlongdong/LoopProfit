@@ -47,7 +47,7 @@ fi
 
 # Android Qt SDK usually requires matching desktop Qt host tools.
 if [[ ! -d "$QT_DIR/6.7.2/gcc_64" ]]; then
-  host_args=(install-qt linux desktop 6.7.2 gcc_64 --outputdir "$QT_DIR")
+  host_args=(install-qt linux desktop 6.7.2 linux_gcc_64 --outputdir "$QT_DIR")
   if [[ -n "$QT_MIRROR" ]]; then
     host_args+=(--base "$QT_MIRROR")
   fi
