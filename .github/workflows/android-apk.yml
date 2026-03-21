@@ -38,7 +38,7 @@ jobs:
           version: '6.7.2'
           target: 'android'
           arch: 'android_arm64_v8a'
-          modules: 'qtdeclarative qtshadertools'
+          modules: 'qtdeclarative'
 
       - name: Install Qt (Desktop host)
         uses: jurplel/install-qt-action@v4
