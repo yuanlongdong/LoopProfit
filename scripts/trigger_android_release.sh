@@ -90,10 +90,10 @@ for r in d.get("workflow_runs",[]):
     created=r.get("created_at","")
     if created and created < since:
         continue
-    rid=str(r.get("id",""))
-    status=r.get("status","")
-    conclusion=r.get("conclusion","")
-    html=r.get("html_url","")
+    rid=str(r.get("id","") or "")
+    status=str(r.get("status","") or "")
+    conclusion=str(r.get("conclusion","") or "")
+    html=str(r.get("html_url","") or "")
     best=(rid,status,conclusion,html)
     break
 if best:
