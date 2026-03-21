@@ -1,0 +1,109 @@
+#include "DatabaseManager.h"
+#include "LoopEngine.h"
+
+#include <QDateTime>
+#include <QSqlQuery>
+#include <QtTest>
+
+class LoopEngineTest : public QObject {
+    Q_OBJECT
+
+private slots:
+    void initTestCase();
+    void investValidation();
+    void transactionAndRecords();
+    void auditStats();
+    void conflictDisclosure();
+    void blockWhenConflictOpen();
+
+private:
+    DatabaseManager *m_db = nullptr;
+    LoopEngine *m_engine = nullptr;
+};
+
+void LoopEngineTest::initTestCase()
+{
+    m_db = new DatabaseManager(QStringLiteral("loopprofit-test"));
+    QVERIFY(m_db->open(QStringLiteral(":memory:")));
+    QVERIFY(m_db->initSchema());
+
+    UserProfile user{1, QStringLiteral("u1"), 100.0, 99, 0.0};
+    StrategyConfig cfg;
+    cfg.userId = 1;
+    cfg.targetMultiplier = 1.2;
+    cfg.investPerRound = 10.0;
+    cfg.maxRounds = 3;
+    cfg.maxAttemptsPerRound = 2;
+    cfg.stopLossFailures = 2;
+    cfg.aiExpansionStep = 1;
+    cfg.autoReinvest = true;
+
+    QVERIFY(m_db->upsertUser(user));
+    QVERIFY(m_db->upsertConfig(cfg));
+
+    m_engine = new LoopEngine(m_db);
+}
+
+void LoopEngineTest::investValidation()
+{
+    auto s = m_engine->runLoop(1, -10.0);
+    QVERIFY(!s.success);
+
+    s = m_engine->runLoop(1, 1000.0);
+    QVERIFY(!s.success);
+}
+
+void LoopEngineTest::transactionAndRecords()
+{
+    const auto s = m_engine->runLoop(1, 10.0);
+    QVERIFY(s.success);
+    QVERIFY(!s.tradeId.isEmpty());
+
+    QSqlQuery q(m_db->database());
+    QVERIFY(q.exec(QStringLiteral("SELECT COUNT(1) FROM token_invest WHERE user_id = 1")));
+    QVERIFY(q.next());
+    QVERIFY(q.value(0).toInt() >= 1);
+
+    QVERIFY(q.exec(QStringLiteral("SELECT wallet_balance,total_profit FROM users WHERE id = 1")));
+    QVERIFY(q.next());
+    QVERIFY(q.value(0).toDouble() > 90.0);
+    QVERIFY(q.value(1).toDouble() >= 0.0);
+}
+
+void LoopEngineTest::auditStats()
+{
+    const auto stats = m_db->auditStatsByUser(1);
+    QVERIFY(stats.totalRounds > 0);
+    QVERIFY(stats.successRounds + stats.failedRounds == stats.totalRounds);
+    QVERIFY(stats.successRate >= 0.0);
+    QVERIFY(stats.failureRate >= 0.0);
+}
+
+
+void LoopEngineTest::conflictDisclosure()
+{
+    ConflictDisclosure disclosure{1, QStringLiteral("ISSUE_2"), QStringLiteral("test conflict")};
+    QVERIFY(m_db->recordConflictDisclosure(disclosure, QDateTime::currentDateTimeUtc()));
+
+    QSqlQuery q(m_db->database());
+    QVERIFY(q.exec(QStringLiteral("SELECT COUNT(1) FROM conflict_disclosures WHERE user_id = 1 AND conflict_type='ISSUE_2'")));
+    QVERIFY(q.next());
+    QVERIFY(q.value(0).toInt() >= 1);
+}
+
+
+void LoopEngineTest::blockWhenConflictOpen()
+{
+    ConflictDisclosure disclosure{1, QStringLiteral("ISSUE_2"), QStringLiteral("blocking conflict")};
+    QVERIFY(m_db->recordConflictDisclosure(disclosure, QDateTime::currentDateTimeUtc()));
+
+    auto s = m_engine->runLoop(1, 10.0);
+    QVERIFY(!s.success);
+
+    QVERIFY(m_db->resolveConflict(1, QStringLiteral("ISSUE_2"), QDateTime::currentDateTimeUtc()));
+    s = m_engine->runLoop(1, 10.0);
+    QVERIFY(s.success);
+}
+
+QTEST_MAIN(LoopEngineTest)
+#include "test_loopengine.moc"
