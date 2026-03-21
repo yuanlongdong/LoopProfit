@@ -32,11 +32,19 @@ jobs:
           version: '6.7.2'
           target: 'android'
           arch: 'android_arm64_v8a'
+          modules: 'qtdeclarative qtshadertools'
 
       - name: Install build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build build-essential qt6-base-dev-tools
+
+
+      - name: Debug Qt paths
+        run: |
+          echo "QT_ROOT_DIR=${QT_ROOT_DIR:-}"
+          echo "RUNNER_TEMP=${RUNNER_TEMP}"
+          find "${QT_ROOT_DIR:-/nonexistent}" -maxdepth 4 -type f -name androiddeployqt 2>/dev/null || true
 
       - name: Build APK (unsigned)
         env:

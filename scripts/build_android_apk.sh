@@ -52,7 +52,7 @@ cmake -S . -B "${BUILD_DIR}" -G Ninja \
   -DCMAKE_TOOLCHAIN_FILE="${QT_ANDROID_DIR}/lib/cmake/Qt6/qt.toolchain.cmake" \
   -DANDROID_ABI=arm64-v8a \
   -DANDROID_PLATFORM=android-24 \
-  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_BUILD_TYPE="${BUILD_TYPE^}"
 
 cmake --build "${BUILD_DIR}" -j
 cmake --install "${BUILD_DIR}" --prefix "${INSTALL_DIR}"
@@ -80,6 +80,8 @@ if [[ -n "${JAVA_HOME:-}" ]]; then
   args+=(--jdk "$JAVA_HOME")
 fi
 
+echo "Using androiddeployqt: $ANDROIDDEPLOYQT_BIN"
+echo "Using androiddeployqt json: $ANDROIDDEPLOYQT_JSON"
 "$ANDROIDDEPLOYQT_BIN" "${args[@]}"
 
 echo "APK output directory: ${BUILD_DIR}/android-build/build/outputs/apk/${BUILD_TYPE}"
