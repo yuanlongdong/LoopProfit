@@ -26,6 +26,8 @@ ApplicationWindow {
         Button {
             text: "初始化演示数据"
             enabled: !appController.running
+        Button {
+            text: "初始化演示数据"
             onClicked: appController.initializeDemoData()
         }
 
@@ -82,6 +84,8 @@ ApplicationWindow {
                     }
                 }
             }
+        }
+            onClicked: appController.startLoop(1, 20)
         }
     }
 }
