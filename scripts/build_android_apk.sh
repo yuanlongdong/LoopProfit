@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+set -x
 
 # Usage:
 #   ANDROID_NDK_ROOT=/path/to/ndk \
@@ -17,6 +18,13 @@ fi
 : "${ANDROID_SDK_ROOT:?ANDROID_SDK_ROOT is required}"
 : "${ANDROID_NDK_ROOT:?ANDROID_NDK_ROOT is required}"
 : "${QT_ANDROID_DIR:?QT_ANDROID_DIR is required}"
+
+TOOLCHAIN_FILE="${QT_ANDROID_DIR}/lib/cmake/Qt6/qt.toolchain.cmake"
+if [[ ! -f "$TOOLCHAIN_FILE" ]]; then
+  echo "Qt Android toolchain file missing: $TOOLCHAIN_FILE"
+  find "$QT_ANDROID_DIR" -maxdepth 5 -type f | head -n 50 || true
+  exit 1
+fi
 
 QT_VERSION_ROOT="$(dirname "$QT_ANDROID_DIR")"
 QT_HOST_PATH="${QT_HOST_PATH:-$QT_VERSION_ROOT/gcc_64}"
@@ -82,6 +90,10 @@ fi
 
 echo "Using androiddeployqt: $ANDROIDDEPLOYQT_BIN"
 echo "Using androiddeployqt json: $ANDROIDDEPLOYQT_JSON"
-"$ANDROIDDEPLOYQT_BIN" "${args[@]}"
+"$ANDROIDDEPLOYQT_BIN" "${args[@]}" || {
+  echo "androiddeployqt failed"
+  find "${BUILD_DIR}/android-build" -maxdepth 6 -type f \( -name "*.log" -o -name "*.txt" \) -print -exec tail -n 200 {} \; || true
+  exit 1
+}
 
 echo "APK output directory: ${BUILD_DIR}/android-build/build/outputs/apk/${BUILD_TYPE}"
