@@ -31,7 +31,7 @@ jobs:
       - name: Bootstrap Android + Qt toolchain
         run: |
           ./scripts/bootstrap_android_env.sh "$RUNNER_TEMP/android-env" > "$RUNNER_TEMP/android-env-vars.sh"
-          cat "$RUNNER_TEMP/android-env-vars.sh" >> "$GITHUB_ENV"
+          grep "^export " "$RUNNER_TEMP/android-env-vars.sh" | sed "s/^export //" >> "$GITHUB_ENV"
 
       - name: Build APK (unsigned)
         env:
