@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Merge-resolution note:
+# Keep Qt Concurrent enabled because AppController runs LoopEngine in background threads.
+# This supersedes the older main-branch variant that omitted Concurrent.
 find_package(Qt6 REQUIRED COMPONENTS Core Sql Qml Quick Test Concurrent)
 
 qt_standard_project_setup()
@@ -18,6 +21,7 @@ add_library(loopprofit_core
 target_include_directories(loopprofit_core PUBLIC src)
 target_link_libraries(loopprofit_core PUBLIC Qt6::Core Qt6::Sql Qt6::Concurrent)
 
+# Merge-resolution note: keep compile warnings from codex branch for stricter quality gates.
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(loopprofit_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
