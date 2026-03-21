@@ -104,6 +104,15 @@ ctest --test-dir build --output-on-failure
 ```
 
 
+一条命令本地打包并发布（会输出 APK HTTP 直链）：
+
+```bash
+GITHUB_TOKEN=... ./scripts/package_release_apk.sh <owner> <repo> <tag> [install_dir]
+```
+
+说明：该命令会依次执行环境引导、release 打包、上传 Release 资产。
+
+
 若本机无 Android/Qt 环境，可先执行：
 
 ```bash
