@@ -36,8 +36,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install "aqtinstall>=3.1.18"
-          python -m aqt install-qt linux android 6.7.2 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt"
-          python -m aqt install-qt linux desktop 6.7.2 gcc_64 --outputdir "${RUNNER_TEMP}/qt"
+          if ! python -m aqt install-qt linux android 6.7.2 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt"; then
+            python -m aqt install-qt linux android 6.7.2 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt" --base https://mirrors.tuna.tsinghua.edu.cn/qt
+          fi
+          if ! python -m aqt install-qt linux desktop 6.7.2 gcc_64 --outputdir "${RUNNER_TEMP}/qt"; then
+            python -m aqt install-qt linux desktop 6.7.2 gcc_64 --outputdir "${RUNNER_TEMP}/qt" --base https://mirrors.tuna.tsinghua.edu.cn/qt
+          fi
           echo "QT_ROOT_DIR=${RUNNER_TEMP}/qt" >> "$GITHUB_ENV"
 
       - name: Install build dependencies
