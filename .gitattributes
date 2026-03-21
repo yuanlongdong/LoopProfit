@@ -1,0 +1,14 @@
+# Normalize text files to LF and reduce cross-platform merge noise
+* text=auto eol=lf
+
+# Prefer union merge for documentation-like files to reduce manual conflicts
+*.md merge=union
+*.yml merge=union
+*.yaml merge=union
+
+# Qt project sources remain textual with standard merge behavior
+*.qml text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.cmake text eol=lf
+CMakeLists.txt text eol=lf
