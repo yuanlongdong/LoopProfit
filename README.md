@@ -24,6 +24,17 @@ sudo apt-get update
 sudo apt-get install -y cmake build-essential ninja-build qt6-base-dev qt6-base-dev-tools qt6-declarative-dev
 ```
 
+
+## 合并冲突快速检查
+
+在继续开发前可先执行：
+
+```bash
+./scripts/check_merge_conflicts.sh
+```
+
+该脚本会检查核心文件是否包含 `<<<<<<<` / `=======` / `>>>>>>>` 冲突标记。
+
 ## 构建与测试
 
 ```bash
