@@ -113,6 +113,15 @@ GITHUB_TOKEN=... ./scripts/package_release_apk.sh <owner> <repo> <tag> [install_
 说明：该命令会依次执行环境引导、release 打包、上传 Release 资产。
 
 
+若你希望在 GitHub 端自动构建并直接拿到 release APK 链接，可用：
+
+```bash
+GITHUB_TOKEN=... ./scripts/trigger_android_release.sh <owner> <repo> <tag>
+```
+
+该脚本会：自动补 tag（若不存在）→ 触发 `android-apk.yml` → 等待成功 → 输出 APK 下载链接。
+
+
 若本机无 Android/Qt 环境，可先执行：
 
 ```bash
