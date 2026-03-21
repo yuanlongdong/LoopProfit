@@ -39,12 +39,10 @@ jobs:
           arch: 'android_arm64_v8a'
 
       - name: Install Qt (Desktop host tools)
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.7.2'
-          target: 'desktop'
-          arch: 'gcc_64'
-          dir: ${{ runner.temp }}/qt-host
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "aqtinstall>=3.1.18"
+          python -m aqt install-qt linux desktop 6.7.2 gcc_64 --outputdir "${RUNNER_TEMP}/qt-host"
 
       - name: Install build dependencies
         run: |
