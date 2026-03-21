@@ -23,30 +23,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Qt (Android)
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '6.7.2'
-          target: 'android'
-          arch: 'android_arm64_v8a'
-
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build build-essential
+          sudo apt-get install -y cmake ninja-build build-essential unzip curl
 
-      - name: Install Android SDK + NDK (pinned)
+      - name: Bootstrap Android + Qt toolchain
         run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125"
-          rm -rf "${ANDROID_SDK_ROOT}/platforms/android-36-ext19" || true
-          echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/26.1.10909125" >> "$GITHUB_ENV"
+          ./scripts/bootstrap_android_env.sh "$RUNNER_TEMP/android-env" > "$RUNNER_TEMP/android-env-vars.sh"
+          cat "$RUNNER_TEMP/android-env-vars.sh" >> "$GITHUB_ENV"
 
       - name: Build APK (unsigned)
         env:
-          QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}
+          QT_ANDROID_DIR: ${{ env.QT_ANDROID_DIR }}
           QT_HOST_PATH: ${{ env.QT_HOST_PATH }}
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
