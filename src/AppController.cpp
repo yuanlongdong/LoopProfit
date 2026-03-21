@@ -1,6 +1,7 @@
 #include "AppController.h"
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QtConcurrent>
 
@@ -92,5 +93,17 @@ void AppController::refreshStatsStatus(int userId)
                    .arg(data.successRate * 100.0, 0, 'f', 2)
                    .arg(data.failureRate * 100.0, 0, 'f', 2)
                    .arg(data.totalProfit, 0, 'f', 2);
+    emit statusChanged();
+}
+
+void AppController::discloseConflict(int userId, const QString &conflictType, const QString &details)
+{
+    ConflictDisclosure disclosure;
+    disclosure.userId = userId;
+    disclosure.conflictType = conflictType;
+    disclosure.details = details;
+
+    const bool ok = m_db.recordConflictDisclosure(disclosure, QDateTime::currentDateTimeUtc());
+    m_status = ok ? QStringLiteral("利益冲突已登记") : QStringLiteral("利益冲突登记失败");
     emit statusChanged();
 }

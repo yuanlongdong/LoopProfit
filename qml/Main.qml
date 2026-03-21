@@ -37,5 +37,10 @@ ApplicationWindow {
             text: "查看统计"
             onClicked: appController.refreshStatsStatus(1)
         }
+
+        Button {
+            text: "登记利益冲突#2"
+            onClicked: appController.discloseConflict(1, "ISSUE_2", "共享AI池收益分配潜在冲突，已上报审计")
+        }
     }
 }

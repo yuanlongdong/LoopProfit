@@ -38,3 +38,9 @@ struct AuditStats {
     double successRate = 0.0;
     double failureRate = 0.0;
 };
+
+struct ConflictDisclosure {
+    int userId = 0;
+    QString conflictType;
+    QString details;
+};

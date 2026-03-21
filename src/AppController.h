@@ -21,6 +21,7 @@ public:
     Q_INVOKABLE void startLoop(int userId, double investAmount);
     Q_INVOKABLE QVariantMap stats(int userId) const;
     Q_INVOKABLE void refreshStatsStatus(int userId);
+    Q_INVOKABLE void discloseConflict(int userId, const QString &conflictType, const QString &details);
 
 signals:
     void statusChanged();

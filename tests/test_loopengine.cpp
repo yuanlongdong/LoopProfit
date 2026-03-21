@@ -1,6 +1,7 @@
 #include "DatabaseManager.h"
 #include "LoopEngine.h"
 
+#include <QDateTime>
 #include <QSqlQuery>
 #include <QtTest>
 
@@ -12,6 +13,7 @@ private slots:
     void investValidation();
     void transactionAndRecords();
     void auditStats();
+    void conflictDisclosure();
 
 private:
     DatabaseManager *m_db = nullptr;
@@ -74,6 +76,18 @@ void LoopEngineTest::auditStats()
     QVERIFY(stats.successRounds + stats.failedRounds == stats.totalRounds);
     QVERIFY(stats.successRate >= 0.0);
     QVERIFY(stats.failureRate >= 0.0);
+}
+
+
+void LoopEngineTest::conflictDisclosure()
+{
+    ConflictDisclosure disclosure{1, QStringLiteral("ISSUE_2"), QStringLiteral("test conflict")};
+    QVERIFY(m_db->recordConflictDisclosure(disclosure, QDateTime::currentDateTimeUtc()));
+
+    QSqlQuery q(m_db->database());
+    QVERIFY(q.exec(QStringLiteral("SELECT COUNT(1) FROM conflict_disclosures WHERE user_id = 1 AND conflict_type='ISSUE_2'")));
+    QVERIFY(q.next());
+    QVERIFY(q.value(0).toInt() >= 1);
 }
 
 QTEST_MAIN(LoopEngineTest)

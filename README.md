@@ -48,3 +48,10 @@ ctest --test-dir build --output-on-failure
 - `notifications`
 
 > 收益逻辑 `LoopEngine::executeBlackBoxProfit` 为可插拔黑箱函数，后续可替换为真实 AI 执行器。
+
+
+## 利益冲突 #2 处理
+
+系统新增 `conflict_disclosures` 审计表，并提供 UI 入口用于登记冲突事件（如共享 AI 池收益归属冲突）。
+登记后可追溯用户、冲突类型、详情与时间戳。
+

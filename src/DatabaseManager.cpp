@@ -89,6 +89,14 @@ bool DatabaseManager::initSchema()
                        "kind TEXT NOT NULL,"
                        "content TEXT NOT NULL,"
                        "created_at TEXT NOT NULL"
+                       ")"),
+        QStringLiteral("CREATE TABLE IF NOT EXISTS conflict_disclosures ("
+                       "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                       "user_id INTEGER NOT NULL,"
+                       "conflict_type TEXT NOT NULL,"
+                       "details TEXT NOT NULL,"
+                       "created_at TEXT NOT NULL,"
+                       "FOREIGN KEY(user_id) REFERENCES users(id)"
                        ")")};
 
     for (const auto &sql : ddl) {
@@ -263,6 +271,18 @@ bool DatabaseManager::recordNotification(int userId, const QString &kind, const 
     q.addBindValue(userId);
     q.addBindValue(kind);
     q.addBindValue(content);
+    q.addBindValue(ts.toString(Qt::ISODate));
+    return q.exec();
+}
+
+
+bool DatabaseManager::recordConflictDisclosure(const ConflictDisclosure &disclosure, const QDateTime &ts)
+{
+    QSqlQuery q(m_db);
+    q.prepare(QStringLiteral("INSERT INTO conflict_disclosures(user_id, conflict_type, details, created_at) VALUES(?, ?, ?, ?)"));
+    q.addBindValue(disclosure.userId);
+    q.addBindValue(disclosure.conflictType);
+    q.addBindValue(disclosure.details);
     q.addBindValue(ts.toString(Qt::ISODate));
     return q.exec();
 }
