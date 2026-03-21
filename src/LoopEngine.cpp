@@ -20,6 +20,8 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
     ExecutionSummary summary;
     if (!m_db) {
         summary.message = QStringLiteral("数据库未初始化");
+    if (!m_db || investAmount <= 0.0) {
+        summary.message = QStringLiteral("投入token必须为正数");
         return summary;
     }
 
@@ -29,8 +31,7 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
     if (user.userId == 0) {
         summary.message = QStringLiteral("用户不存在");
         return summary;
-    }
-
+    
     if (m_db->hasOpenConflict(userId, QStringLiteral("ISSUE_2"))) {
         summary.message = QStringLiteral("存在未解决的利益冲突#2，请先处理冲突后再执行循环");
         return summary;
@@ -53,6 +54,7 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
         return summary;
     }
     if (actualInvest > user.walletBalance) {
+    if (investAmount > user.walletBalance) {
         summary.message = QStringLiteral("投入token超过钱包余额");
         return summary;
     }
@@ -66,6 +68,9 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
     const QString tradeId = m_db->recordTokenInvest(userId, actualInvest, user.aiCount, startTs);
     if (tradeId.isEmpty() || !m_db->updateUserAfterRound(userId, -actualInvest, 0.0, 0) ||
         !m_db->recordLog(userId, QStringLiteral("INVEST"), QStringLiteral("trade=%1 amount=%2").arg(tradeId).arg(actualInvest), startTs)) {
+    const auto now = QDateTime::currentDateTimeUtc();
+    const QString tradeId = m_db->recordTokenInvest(userId, investAmount, user.aiCount, now);
+    if (tradeId.isEmpty() || !m_db->updateUserAfterRound(userId, -investAmount, 0.0, 0)) {
         m_db->rollback();
         summary.message = QStringLiteral("记录投token失败，已回滚");
         return summary;
@@ -86,6 +91,14 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
             result.attemptsUsed = attempt;
 
             const double ratio = (actualInvest + result.profit) / actualInvest;
+        result.invested = investAmount;
+
+        for (int attempt = 1; attempt <= config.maxAttemptsPerRound; ++attempt) {
+            const double p = executeBlackBoxProfit(investAmount, user.aiCount + aiDelta, attempt);
+            result.profit += p;
+            result.attemptsUsed = attempt;
+
+            const double ratio = (investAmount + result.profit) / investAmount;
             if (ratio >= config.targetMultiplier) {
                 result.targetReached = true;
                 break;
@@ -97,6 +110,7 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
 
         const auto roundTs = QDateTime::currentDateTimeUtc();
         if (!m_db->recordRound(userId, result, roundTs) ||
+        if (!m_db->recordRound(userId, result, now) ||
             !m_db->recordLog(userId,
                              QStringLiteral("ROUND"),
                              QStringLiteral("round=%1 profit=%2 target=%3")
@@ -104,6 +118,7 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
                                  .arg(result.profit)
                                  .arg(result.targetReached),
                              roundTs)) {
+                             now)) {
             m_db->rollback();
             summary.message = QStringLiteral("轮次记录失败，已回滚");
             return summary;
@@ -136,6 +151,21 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
                     summary.message = QStringLiteral("止损通知记录失败，已回滚");
                     return summary;
                 }
+            m_db->recordLog(userId,
+                            QStringLiteral("AI_EXPAND"),
+                            QStringLiteral("ai +%1 at round %2").arg(config.aiExpansionStep).arg(round),
+                            now);
+            m_db->recordNotification(userId,
+                                     QStringLiteral("TARGET_REACHED"),
+                                     QStringLiteral("第%1轮收益达标，已扩AI").arg(round),
+                                     now);
+        } else {
+            failedRounds++;
+            if (!config.autoReinvest || failedRounds >= config.stopLossFailures) {
+                m_db->recordNotification(userId,
+                                         QStringLiteral("STOP_LOSS"),
+                                         QStringLiteral("触发止损，循环停止。失败轮次=%1").arg(failedRounds),
+                                         now);
                 break;
             }
         }
@@ -149,6 +179,7 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
     }
 
     if (!m_db->updateUserAfterRound(userId, actualInvest + cumulativeProfit, cumulativeProfit, aiDelta)) {
+    if (!m_db->updateUserAfterRound(userId, investAmount + cumulativeProfit, cumulativeProfit, aiDelta)) {
         m_db->rollback();
         summary.message = QStringLiteral("用户资产更新失败，已回滚");
         return summary;
