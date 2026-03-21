@@ -1,6 +1,11 @@
 #include "AppController.h"
 
 #include <QCoreApplication>
+#include <QDateTime>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QtConcurrent>
 #include <QDir>
 
 AppController::AppController(QObject *parent)
@@ -12,6 +17,21 @@ AppController::AppController(QObject *parent)
     } else {
         m_status = QStringLiteral("数据库初始化失败");
     }
+
+    connect(&m_watcher, &QFutureWatcher<LoopEngine::ExecutionSummary>::finished, this, [this]() {
+        const auto summary = m_watcher.result();
+        if (summary.success) {
+            m_status = QStringLiteral("完成。交易ID=%1，收益=%2，扩AI=%3")
+                           .arg(summary.tradeId)
+                           .arg(summary.cumulativeProfit)
+                           .arg(summary.aiExpanded);
+        } else {
+            m_status = QStringLiteral("失败: %1").arg(summary.message);
+        }
+        m_running = false;
+        emit runningChanged();
+        emit statusChanged();
+    });
 }
 
 void AppController::initializeDemoData()
@@ -43,6 +63,95 @@ void AppController::initializeDemoData()
 
 void AppController::startLoop(int userId, double investAmount)
 {
+    if (m_running) {
+        m_status = QStringLiteral("循环执行中，请稍候");
+        emit statusChanged();
+        return;
+    }
+
+    m_running = true;
+    emit runningChanged();
+    m_status = QStringLiteral("循环任务已提交");
+    emit statusChanged();
+
+    m_watcher.setFuture(QtConcurrent::run([this, userId, investAmount]() { return m_engine.runLoop(userId, investAmount); }));
+}
+
+QVariantMap AppController::stats(int userId) const
+{
+    const auto data = m_db.auditStatsByUser(userId);
+    return QVariantMap{{QStringLiteral("totalRounds"), data.totalRounds},
+                       {QStringLiteral("successRounds"), data.successRounds},
+                       {QStringLiteral("failedRounds"), data.failedRounds},
+                       {QStringLiteral("totalProfit"), data.totalProfit},
+                       {QStringLiteral("successRate"), data.successRate},
+                       {QStringLiteral("failureRate"), data.failureRate}};
+}
+
+void AppController::refreshStatsStatus(int userId)
+{
+    const auto data = m_db.auditStatsByUser(userId);
+    m_status = QStringLiteral("统计：轮次=%1 成功率=%2% 失败率=%3% 总收益=%4")
+                   .arg(data.totalRounds)
+                   .arg(data.successRate * 100.0, 0, 'f', 2)
+                   .arg(data.failureRate * 100.0, 0, 'f', 2)
+                   .arg(data.totalProfit, 0, 'f', 2);
+    emit statusChanged();
+}
+
+void AppController::discloseConflict(int userId, const QString &conflictType, const QString &details)
+{
+    ConflictDisclosure disclosure;
+    disclosure.userId = userId;
+    disclosure.conflictType = conflictType;
+    disclosure.details = details;
+
+    const bool ok = m_db.recordConflictDisclosure(disclosure, QDateTime::currentDateTimeUtc());
+    m_status = ok ? QStringLiteral("利益冲突已登记") : QStringLiteral("利益冲突登记失败");
+    emit statusChanged();
+}
+
+void AppController::resolveConflict2(int userId)
+{
+    const bool ok = m_db.resolveConflict(userId, QStringLiteral("ISSUE_2"), QDateTime::currentDateTimeUtc());
+    m_status = ok ? QStringLiteral("利益冲突#2 已标记解决") : QStringLiteral("利益冲突#2 解决失败");
+    emit statusChanged();
+}
+
+void AppController::exportRoundReportCsv(int userId, const QString &outputPath, const QString &fromIso, const QString &toIso)
+{
+    const auto rows = m_db.roundReportByUser(userId, fromIso, toIso);
+    QFile file(outputPath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        m_status = QStringLiteral("报表导出失败：无法写入文件");
+        emit statusChanged();
+        return;
+    }
+
+    QTextStream out(&file);
+    out << "round_no,invested,profit,target_reached,created_at\\n";
+    for (const auto &r : rows) {
+        out << r.roundNumber << ',' << r.invested << ',' << r.profit << ','
+            << (r.targetReached ? 1 : 0) << ',' << r.createdAt << "\\n";
+    }
+    file.close();
+
+    m_status = QStringLiteral("报表导出成功：%1（%2条）").arg(outputPath).arg(rows.size());
+    emit statusChanged();
+}
+
+QVariantList AppController::profitSeries(int userId) const
+{
+    QVariantList points;
+    const auto rows = m_db.roundReportByUser(userId, QString(), QString());
+    for (const auto &r : rows) {
+        QVariantMap m;
+        m.insert(QStringLiteral("round"), r.roundNumber);
+        m.insert(QStringLiteral("profit"), r.profit);
+        points.push_back(m);
+    }
+    return points;
+}
     const auto summary = m_engine.runLoop(userId, investAmount);
     if (summary.success) {
         m_status = QStringLiteral("完成。交易ID=%1，收益=%2，扩AI=%3")
