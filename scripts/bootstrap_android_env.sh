@@ -55,10 +55,10 @@ if [[ ! -d "$QT_DIR/6.7.2/gcc_64" ]]; then
 fi
 
 cat <<ENV
-export ANDROID_SDK_ROOT="$SDK_DIR"
-export ANDROID_NDK_ROOT="$SDK_DIR/ndk/26.1.10909125"
-export QT_ANDROID_DIR="$QT_DIR/6.7.2/android_arm64_v8a"
-export QT_HOST_PATH="$QT_DIR/6.7.2/gcc_64"
+export ANDROID_SDK_ROOT=$SDK_DIR
+export ANDROID_NDK_ROOT=$SDK_DIR/ndk/26.1.10909125
+export QT_ANDROID_DIR=$QT_DIR/6.7.2/android_arm64_v8a
+export QT_HOST_PATH=$QT_DIR/6.7.2/gcc_64
 # Optional:
 # export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
 ENV
