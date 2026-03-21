@@ -36,11 +36,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install "aqtinstall>=3.1.18"
-          if ! python -m aqt install-qt linux android 6.7.2 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt"; then
-            python -m aqt install-qt linux android 6.7.2 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt" --base https://mirrors.tuna.tsinghua.edu.cn/qt
+          if ! python -m aqt install-qt linux android 6.5.3 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt"; then
+            python -m aqt install-qt linux android 6.5.3 android_arm64_v8a --outputdir "${RUNNER_TEMP}/qt" --base https://mirrors.tuna.tsinghua.edu.cn/qt
           fi
-          if ! python -m aqt install-qt linux desktop 6.7.2 gcc_64 --outputdir "${RUNNER_TEMP}/qt"; then
-            python -m aqt install-qt linux desktop 6.7.2 gcc_64 --outputdir "${RUNNER_TEMP}/qt" --base https://mirrors.tuna.tsinghua.edu.cn/qt
+          if ! python -m aqt install-qt linux desktop 6.5.3 gcc_64 --outputdir "${RUNNER_TEMP}/qt"; then
+            python -m aqt install-qt linux desktop 6.5.3 gcc_64 --outputdir "${RUNNER_TEMP}/qt" --base https://mirrors.tuna.tsinghua.edu.cn/qt
           fi
           echo "QT_ROOT_DIR=${RUNNER_TEMP}/qt" >> "$GITHUB_ENV"
 
@@ -59,8 +59,8 @@ jobs:
 
       - name: Build APK (unsigned)
         env:
-          QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.7.2/android_arm64_v8a
-          QT_HOST_PATH: ${{ env.QT_ROOT_DIR }}/6.7.2/gcc_64
+          QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.5.3/android_arm64_v8a
+          QT_HOST_PATH: ${{ env.QT_ROOT_DIR }}/6.5.3/gcc_64
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
         run: ./scripts/build_android_apk.sh
