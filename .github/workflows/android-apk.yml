@@ -38,19 +38,27 @@ jobs:
           target: 'android'
           arch: 'android_arm64_v8a'
 
+      - name: Install Qt (Desktop host tools)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.2'
+          target: 'desktop'
+          arch: 'gcc_64'
+          dir: ${{ runner.temp }}/qt-host
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build build-essential qt6-base-dev-tools qt6-tools-dev-tools
+          sudo apt-get install -y cmake ninja-build build-essential
 
       - name: Build APK (unsigned)
         env:
           QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.7.2/android_arm64_v8a
-          QT_HOST_PATH: /usr/lib/qt6
+          QT_HOST_PATH: ${{ runner.temp }}/qt-host/Qt/6.7.2/gcc_64
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
         run: |
-          export PATH="/usr/lib/qt6/bin:${PATH}"
+          export PATH="${QT_HOST_PATH}/bin:${PATH}"
           ./scripts/build_android_apk.sh
 
       - name: Collect APK
