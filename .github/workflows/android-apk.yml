@@ -39,6 +39,7 @@ jobs:
           arch: 'android_arm64_v8a'
 
       - name: Install Qt (Desktop host tools)
+        continue-on-error: true
         run: |
           python -m pip install --upgrade pip
           python -m pip install "aqtinstall>=3.1.18"
@@ -47,15 +48,21 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build build-essential
+          sudo apt-get install -y cmake ninja-build build-essential qt6-base-dev-tools qt6-tools-dev-tools
 
       - name: Build APK (unsigned)
         env:
           QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.7.2/android_arm64_v8a
-          QT_HOST_PATH: ${{ runner.temp }}/qt-host/Qt/6.7.2/gcc_64
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
         run: |
+          if [[ -x "${RUNNER_TEMP}/qt-host/6.7.2/gcc_64/bin/androiddeployqt" ]]; then
+            export QT_HOST_PATH="${RUNNER_TEMP}/qt-host/6.7.2/gcc_64"
+          elif [[ -x "${RUNNER_TEMP}/qt-host/Qt/6.7.2/gcc_64/bin/androiddeployqt" ]]; then
+            export QT_HOST_PATH="${RUNNER_TEMP}/qt-host/Qt/6.7.2/gcc_64"
+          else
+            export QT_HOST_PATH="/usr/lib/qt6"
+          fi
           export PATH="${QT_HOST_PATH}/bin:${PATH}"
           ./scripts/build_android_apk.sh
 
