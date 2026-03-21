@@ -14,6 +14,21 @@ LoopProfit 是一个面向移动端的 Qt6 + QML 项目，提供可审计的 AI 
 
 ## Ubuntu 依赖安装
 
+基于“AI翻倍循环助手”规则搭建的 Qt6 移动端项目骨架，当前已实现：
+
+- 多用户账户与配置（`users` / `config`）
+- 投 token 审计（`token_invest`，唯一交易 ID）
+- 循环轮次收益与达标判断（`rounds`）
+- 自动扩 AI、自动复投、止损停止
+- 事务化数据库更新（失败回滚）
+- 日志与通知落库（`logs` / `notifications`）
+- Qt Quick 移动端基础界面
+- 单元测试（QtTest）
+
+## Ubuntu 依赖安装
+
+如果提示找不到 `Qt6Config.cmake`，先安装依赖：
+
 ```bash
 ./scripts/setup_ubuntu_qt6.sh
 ```
@@ -24,7 +39,6 @@ LoopProfit 是一个面向移动端的 Qt6 + QML 项目，提供可审计的 AI 
 sudo apt-get update
 sudo apt-get install -y cmake build-essential ninja-build qt6-base-dev qt6-base-dev-tools qt6-declarative-dev
 ```
-
 
 ## 合并冲突快速检查
 
@@ -40,6 +54,7 @@ sudo apt-get install -y cmake build-essential ninja-build qt6-base-dev qt6-base-
 - `git diff --check` 空白/冲突样式问题
 
 ## 构建与测试
+## 构建
 
 ```bash
 cmake -S . -B build
@@ -145,3 +160,4 @@ GITHUB_TOKEN=... ./scripts/fetch_apk_url.sh <owner> <repo> <tag>
 # 若官方 Qt 源不可达，可指定镜像：
 QT_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/qt ./scripts/bootstrap_android_env.sh
 ```
+> 注意：当前收益逻辑为可替换黑箱模拟函数（`LoopEngine::executeBlackBoxProfit`），后续可接入真实 AI 任务执行器。

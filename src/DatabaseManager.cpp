@@ -1,5 +1,7 @@
 #include "DatabaseManager.h"
 
+#include <QRandomGenerator>
+#include <QSqlError>
 #include <QSqlQuery>
 #include <QUuid>
 
@@ -32,6 +34,7 @@ bool DatabaseManager::open(const QString &dbPath)
 
     QSqlQuery pragma(m_db);
     return pragma.exec(QStringLiteral("PRAGMA foreign_keys = ON"));
+    return m_db.open();
 }
 
 bool DatabaseManager::initSchema()
@@ -271,6 +274,18 @@ QString DatabaseManager::recordTokenInvest(int userId, double amount, int aiCoun
         }
     }
     return {};
+    const QString tradeId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QSqlQuery q(m_db);
+    q.prepare(QStringLiteral("INSERT INTO token_invest(user_id, trade_id, amount, ai_count, created_at) VALUES(?, ?, ?, ?, ?)"));
+    q.addBindValue(userId);
+    q.addBindValue(tradeId);
+    q.addBindValue(amount);
+    q.addBindValue(aiCount);
+    q.addBindValue(ts.toString(Qt::ISODate));
+    if (!q.exec()) {
+        return {};
+    }
+    return tradeId;
 }
 
 bool DatabaseManager::recordRound(int userId, const RoundResult &result, const QDateTime &ts)

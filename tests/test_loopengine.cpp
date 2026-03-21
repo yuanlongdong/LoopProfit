@@ -2,6 +2,7 @@
 #include "LoopEngine.h"
 
 #include <QDateTime>
+#include <QCoreApplication>
 #include <QSqlQuery>
 #include <QtTest>
 

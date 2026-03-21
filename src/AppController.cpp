@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QtConcurrent>
+#include <QDir>
 
 AppController::AppController(QObject *parent)
     : QObject(parent), m_db(QStringLiteral("loopprofit-app")), m_engine(&m_db)
@@ -150,4 +151,15 @@ QVariantList AppController::profitSeries(int userId) const
         points.push_back(m);
     }
     return points;
+}
+    const auto summary = m_engine.runLoop(userId, investAmount);
+    if (summary.success) {
+        m_status = QStringLiteral("完成。交易ID=%1，收益=%2，扩AI=%3")
+                       .arg(summary.tradeId)
+                       .arg(summary.cumulativeProfit)
+                       .arg(summary.aiExpanded);
+    } else {
+        m_status = QStringLiteral("失败: %1").arg(summary.message);
+    }
+    emit statusChanged();
 }

@@ -31,10 +31,17 @@ signals:
     void statusChanged();
     void runningChanged();
 
+    Q_INVOKABLE void initializeDemoData();
+    Q_INVOKABLE void startLoop(int userId, double investAmount);
+
+signals:
+    void statusChanged();
+
 private:
     DatabaseManager m_db;
     LoopEngine m_engine;
     QFutureWatcher<LoopEngine::ExecutionSummary> m_watcher;
     QString m_status;
     bool m_running = false;
+    QString m_status;
 };
