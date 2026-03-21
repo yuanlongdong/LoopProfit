@@ -1,0 +1,64 @@
+name: android-apk
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Qt (Android)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.2'
+          target: 'android'
+          arch: 'android_arm64_v8a'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build build-essential qt6-base-dev-tools
+
+      - name: Build APK (unsigned)
+        env:
+          QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.7.2/android_arm64_v8a
+          QT_HOST_PATH: /usr/lib/qt6
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
+        run: ./scripts/build_android_apk.sh
+
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          cp build-android/android-build/build/outputs/apk/release/*.apk dist/ || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: loopprofit-apk
+          path: dist/*.apk
+
+      - name: Publish release asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.apk
