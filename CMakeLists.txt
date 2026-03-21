@@ -37,6 +37,8 @@ target_link_libraries(LoopProfitApp PRIVATE loopprofit_core Qt6::Core Qt6::Qml Q
 if (ANDROID)
     set_target_properties(LoopProfitApp PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/android/package"
+        QT_ANDROID_VERSION_CODE 10002
+        QT_ANDROID_VERSION_NAME "1.0.2"
     )
 endif()
 
@@ -47,12 +49,14 @@ qt_add_qml_module(LoopProfitApp
         qml/Main.qml
 )
 
-enable_testing()
+if (NOT ANDROID)
+    enable_testing()
 
-qt_add_executable(test_loopengine
-    tests/test_loopengine.cpp
-)
+    qt_add_executable(test_loopengine
+        tests/test_loopengine.cpp
+    )
 
-target_link_libraries(test_loopengine PRIVATE loopprofit_core Qt6::Core Qt6::Sql Qt6::Test)
+    target_link_libraries(test_loopengine PRIVATE loopprofit_core Qt6::Core Qt6::Sql Qt6::Test)
 
-add_test(NAME test_loopengine COMMAND test_loopengine)
+    add_test(NAME test_loopengine COMMAND test_loopengine)
+endif()
