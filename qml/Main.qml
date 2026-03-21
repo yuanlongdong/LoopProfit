@@ -42,5 +42,10 @@ ApplicationWindow {
             text: "登记利益冲突#2"
             onClicked: appController.discloseConflict(1, "ISSUE_2", "共享AI池收益分配潜在冲突，已上报审计")
         }
+
+        Button {
+            text: "解决利益冲突#2"
+            onClicked: appController.resolveConflict2(1)
+        }
     }
 }

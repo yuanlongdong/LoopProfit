@@ -107,3 +107,10 @@ void AppController::discloseConflict(int userId, const QString &conflictType, co
     m_status = ok ? QStringLiteral("利益冲突已登记") : QStringLiteral("利益冲突登记失败");
     emit statusChanged();
 }
+
+void AppController::resolveConflict2(int userId)
+{
+    const bool ok = m_db.resolveConflict(userId, QStringLiteral("ISSUE_2"), QDateTime::currentDateTimeUtc());
+    m_status = ok ? QStringLiteral("利益冲突#2 已标记解决") : QStringLiteral("利益冲突#2 解决失败");
+    emit statusChanged();
+}

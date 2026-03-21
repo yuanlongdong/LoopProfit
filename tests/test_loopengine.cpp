@@ -14,6 +14,7 @@ private slots:
     void transactionAndRecords();
     void auditStats();
     void conflictDisclosure();
+    void blockWhenConflictOpen();
 
 private:
     DatabaseManager *m_db = nullptr;
@@ -88,6 +89,20 @@ void LoopEngineTest::conflictDisclosure()
     QVERIFY(q.exec(QStringLiteral("SELECT COUNT(1) FROM conflict_disclosures WHERE user_id = 1 AND conflict_type='ISSUE_2'")));
     QVERIFY(q.next());
     QVERIFY(q.value(0).toInt() >= 1);
+}
+
+
+void LoopEngineTest::blockWhenConflictOpen()
+{
+    ConflictDisclosure disclosure{1, QStringLiteral("ISSUE_2"), QStringLiteral("blocking conflict")};
+    QVERIFY(m_db->recordConflictDisclosure(disclosure, QDateTime::currentDateTimeUtc()));
+
+    auto s = m_engine->runLoop(1, 10.0);
+    QVERIFY(!s.success);
+
+    QVERIFY(m_db->resolveConflict(1, QStringLiteral("ISSUE_2"), QDateTime::currentDateTimeUtc()));
+    s = m_engine->runLoop(1, 10.0);
+    QVERIFY(s.success);
 }
 
 QTEST_MAIN(LoopEngineTest)

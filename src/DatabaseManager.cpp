@@ -95,7 +95,9 @@ bool DatabaseManager::initSchema()
                        "user_id INTEGER NOT NULL,"
                        "conflict_type TEXT NOT NULL,"
                        "details TEXT NOT NULL,"
+                       "resolved INTEGER NOT NULL DEFAULT 0,"
                        "created_at TEXT NOT NULL,"
+                       "resolved_at TEXT,"
                        "FOREIGN KEY(user_id) REFERENCES users(id)"
                        ")")};
 
@@ -285,6 +287,29 @@ bool DatabaseManager::recordConflictDisclosure(const ConflictDisclosure &disclos
     q.addBindValue(disclosure.details);
     q.addBindValue(ts.toString(Qt::ISODate));
     return q.exec();
+}
+
+
+bool DatabaseManager::resolveConflict(int userId, const QString &conflictType, const QDateTime &ts)
+{
+    QSqlQuery q(m_db);
+    q.prepare(QStringLiteral("UPDATE conflict_disclosures SET resolved = 1, resolved_at = ? WHERE user_id = ? AND conflict_type = ? AND resolved = 0"));
+    q.addBindValue(ts.toString(Qt::ISODate));
+    q.addBindValue(userId);
+    q.addBindValue(conflictType);
+    return q.exec();
+}
+
+bool DatabaseManager::hasOpenConflict(int userId, const QString &conflictType) const
+{
+    QSqlQuery q(m_db);
+    q.prepare(QStringLiteral("SELECT COUNT(1) FROM conflict_disclosures WHERE user_id = ? AND conflict_type = ? AND resolved = 0"));
+    q.addBindValue(userId);
+    q.addBindValue(conflictType);
+    if (q.exec() && q.next()) {
+        return q.value(0).toInt() > 0;
+    }
+    return false;
 }
 
 bool DatabaseManager::updateUserAfterRound(int userId, double walletDelta, double profitDelta, int aiDelta)

@@ -30,6 +30,8 @@ public:
     bool recordLog(int userId, const QString &eventType, const QString &message, const QDateTime &ts);
     bool recordNotification(int userId, const QString &kind, const QString &content, const QDateTime &ts);
     bool recordConflictDisclosure(const ConflictDisclosure &disclosure, const QDateTime &ts);
+    bool resolveConflict(int userId, const QString &conflictType, const QDateTime &ts);
+    bool hasOpenConflict(int userId, const QString &conflictType) const;
 
     bool updateUserAfterRound(int userId, double walletDelta, double profitDelta, int aiDelta);
 

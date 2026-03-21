@@ -31,6 +31,11 @@ LoopEngine::ExecutionSummary LoopEngine::runLoop(int userId, double investAmount
         return summary;
     }
 
+    if (m_db->hasOpenConflict(userId, QStringLiteral("ISSUE_2"))) {
+        summary.message = QStringLiteral("存在未解决的利益冲突#2，请先处理冲突后再执行循环");
+        return summary;
+    }
+
     if (config.maxRounds <= 0 || config.maxAttemptsPerRound <= 0 || config.stopLossFailures <= 0 ||
         config.targetMultiplier <= 1.0 || config.aiExpansionStep < 0) {
         summary.message = QStringLiteral("策略配置非法");

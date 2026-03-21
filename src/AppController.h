@@ -22,6 +22,7 @@ public:
     Q_INVOKABLE QVariantMap stats(int userId) const;
     Q_INVOKABLE void refreshStatsStatus(int userId);
     Q_INVOKABLE void discloseConflict(int userId, const QString &conflictType, const QString &details);
+    Q_INVOKABLE void resolveConflict2(int userId);
 
 signals:
     void statusChanged();

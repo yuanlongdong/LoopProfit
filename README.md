@@ -52,6 +52,7 @@ ctest --test-dir build --output-on-failure
 
 ## 利益冲突 #2 处理
 
-系统新增 `conflict_disclosures` 审计表，并提供 UI 入口用于登记冲突事件（如共享 AI 池收益归属冲突）。
-登记后可追溯用户、冲突类型、详情与时间戳。
+系统新增 `conflict_disclosures` 审计表，并提供 UI 入口用于登记/解决冲突事件（如共享 AI 池收益归属冲突）。
+当 `ISSUE_2` 存在未解决记录时，LoopEngine 会拒绝执行循环，必须先解决冲突后才能继续。
+登记后可追溯用户、冲突类型、详情、状态与时间戳。
 
