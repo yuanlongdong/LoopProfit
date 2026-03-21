@@ -38,9 +38,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake ninja-build build-essential
 
-      - name: Install Android NDK
+      - name: Install Android SDK + NDK (pinned)
         run: |
-          sdkmanager "ndk;26.1.10909125"
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;26.1.10909125"
+          rm -rf "${ANDROID_SDK_ROOT}/platforms/android-36-ext19" || true
           echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/26.1.10909125" >> "$GITHUB_ENV"
 
       - name: Build APK (unsigned)
