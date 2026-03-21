@@ -3,8 +3,10 @@ project(LoopProfit LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+option(LOOPPROFIT_ENABLE_COVERAGE "Enable gcov/llvm coverage flags" OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Sql Qml Quick Test)
+find_package(Qt6 REQUIRED COMPONENTS Core Sql Qml Quick Test Concurrent)
 
 qt_standard_project_setup()
 
@@ -15,7 +17,16 @@ add_library(loopprofit_core
 )
 
 target_include_directories(loopprofit_core PUBLIC src)
-target_link_libraries(loopprofit_core PUBLIC Qt6::Core Qt6::Sql)
+target_link_libraries(loopprofit_core PUBLIC Qt6::Core Qt6::Sql Qt6::Concurrent)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(loopprofit_core PRIVATE -Wall -Wextra -Wpedantic)
+    if (LOOPPROFIT_ENABLE_COVERAGE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -O0 -g")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+    endif()
+endif()
 
 qt_add_executable(LoopProfitApp
     src/main.cpp
