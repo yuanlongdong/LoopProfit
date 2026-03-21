@@ -29,3 +29,18 @@ struct RoundResult {
     bool targetReached = false;
     int attemptsUsed = 0;
 };
+
+struct AuditStats {
+    int totalRounds = 0;
+    int successRounds = 0;
+    int failedRounds = 0;
+    double totalProfit = 0.0;
+    double successRate = 0.0;
+    double failureRate = 0.0;
+};
+
+struct ConflictDisclosure {
+    int userId = 0;
+    QString conflictType;
+    QString details;
+};
