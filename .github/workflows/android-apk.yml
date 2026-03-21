@@ -33,6 +33,13 @@ jobs:
           target: 'android'
           arch: 'android_arm64_v8a'
 
+      - name: Install Qt (Desktop host tools)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.2'
+          target: 'desktop'
+          arch: 'gcc_64'
+
       - name: Install build dependencies
         run: |
           sudo apt-get update
@@ -41,6 +48,7 @@ jobs:
       - name: Build APK (unsigned)
         env:
           QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.7.2/android_arm64_v8a
+          QT_HOST_PATH: ${{ env.QT_ROOT_DIR }}/6.7.2/gcc_64
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
         run: ./scripts/build_android_apk.sh
