@@ -3,7 +3,3 @@ build-android-release/
 *.db
 *.jks
 *.keystore
-android-app/.gradle/
-android-app/app/build/
-android-app/build/
-android-app/release-keystore.jks

@@ -54,20 +54,15 @@ ctest --test-dir build --output-on-failure
 
 ## Android Release APK
 
-仓库现在已经包含可直接构建的原生 Android 工程：`android-app/`，并且只保留纯文本源码文件，避免 PR 因二进制 wrapper 文件被拦截。
+如果你遇到“无法生成 release apk”，先看：
+
+- `docs/ANDROID_RELEASE.md`
 
 快速执行：
 
 ```bash
+./scripts/check_android_env.sh
 ./scripts/build_android_release_apk.sh
 ```
 
-生成结果：
-
-```text
-android-app/app/build/outputs/apk/release/app-release.apk
-```
-
-更多细节见：
-
-- `docs/ANDROID_RELEASE.md`
+> `build_android_release_apk.sh` 依赖签名环境变量 `KEYSTORE_PATH / KEY_ALIAS / KEYSTORE_PASS`。
