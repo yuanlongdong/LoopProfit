@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/title"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="复刻仓库中的循环收益规则，直接生成可安装 release APK。" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/walletInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/wallet_balance"
+                android:inputType="numberDecimal"
+                android:text="500" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/investInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/invest_amount"
+                android:inputType="numberDecimal"
+                android:text="20" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/aiCountInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/ai_count"
+                android:inputType="number"
+                android:text="99" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/maxRoundsInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/max_rounds"
+                android:inputType="number"
+                android:text="12" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/maxAttemptsInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/max_attempts"
+                android:inputType="number"
+                android:text="4" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/targetMultiplierInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/target_multiplier"
+                android:inputType="numberDecimal"
+                android:text="2.0" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/stopLossInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/stop_loss"
+                android:inputType="number"
+                android:text="3" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/aiExpandStepInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/ai_expand_step"
+                android:inputType="number"
+                android:text="2" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/autoReinvestInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:checked="true"
+            android:text="@string/auto_reinvest" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/runButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/run_loop" />
+
+        <TextView
+            android:id="@+id/resultView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:background="#EAF2FF"
+            android:text="@string/result_hint"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+</ScrollView>

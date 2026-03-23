@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">LoopProfit</string>
+    <string name="title">LoopProfit Android Release</string>
+    <string name="wallet_balance">钱包余额</string>
+    <string name="invest_amount">本次投入</string>
+    <string name="ai_count">AI 数量</string>
+    <string name="max_rounds">最大轮次</string>
+    <string name="max_attempts">每轮尝试次数</string>
+    <string name="target_multiplier">目标倍数</string>
+    <string name="stop_loss">止损失败轮次</string>
+    <string name="ai_expand_step">达标扩 AI 数量</string>
+    <string name="auto_reinvest">失败后自动复投</string>
+    <string name="run_loop">运行循环</string>
+    <string name="result_hint">结果会显示在这里</string>
+</resources>

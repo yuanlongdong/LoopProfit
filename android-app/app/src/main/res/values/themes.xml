@@ -1,0 +1,8 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.LoopProfit" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#0057D9</item>
+        <item name="colorPrimaryVariant">#003E9A</item>
+        <item name="colorSecondary">#00A86B</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+</resources>
