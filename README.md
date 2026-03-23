@@ -54,7 +54,7 @@ ctest --test-dir build --output-on-failure
 
 ## Android Release APK
 
-仓库现在已经包含可直接构建的原生 Android 工程：`android-app/`。
+仓库现在已经包含可直接构建的原生 Android 工程：`android-app/`，并且只保留纯文本源码文件，避免 PR 因二进制 wrapper 文件被拦截。
 
 快速执行：
 

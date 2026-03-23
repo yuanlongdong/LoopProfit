@@ -1,6 +1,6 @@
 # Android Release APK 构建说明
 
-当前仓库已经补充了一个 **可直接产出安装包的原生 Android 工程**，目录在 `android-app/`。
+当前仓库已经补充了一个 **可直接产出安装包的原生 Android 工程**，目录在 `android-app/`；工程仅保留源码与配置文本文件，不提交 Gradle wrapper 二进制。
 
 ## 已验证的产物
 
@@ -19,7 +19,7 @@ android-app/app/build/outputs/apk/release/app-release.apk
 ## 环境要求
 
 - JDK 17+
-- Gradle 8.14.3+
+- 本机已安装 `gradle`（8.14.3+）
 - Android SDK
   - `platforms;android-35`
   - `build-tools;35.0.0`
