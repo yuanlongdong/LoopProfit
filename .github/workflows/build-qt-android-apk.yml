@@ -20,10 +20,10 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       QT_VERSION: 6.7.3
-      QT_BASE_DIR: ${{ runner.workspace }}/qt
-      QT_HOST_PATH: ${{ runner.workspace }}/qt/Qt/6.7.3/gcc_64
-      QT_ANDROID_CMAKE_PREFIX: ${{ runner.workspace }}/qt/Qt/6.7.3/android_arm64_v8a
-      QT_ANDROID_TOOLCHAIN_FILE: ${{ runner.workspace }}/qt/Qt/6.7.3/android_arm64_v8a/lib/cmake/Qt6/qt.toolchain.cmake
+      QT_BASE_DIR: ${{ github.workspace }}/../qt
+      QT_HOST_PATH: ${{ github.workspace }}/../qt/Qt/6.7.3/gcc_64
+      QT_ANDROID_CMAKE_PREFIX: ${{ github.workspace }}/../qt/Qt/6.7.3/android_arm64_v8a
+      QT_ANDROID_TOOLCHAIN_FILE: ${{ github.workspace }}/../qt/Qt/6.7.3/android_arm64_v8a/lib/cmake/Qt6/qt.toolchain.cmake
       ANDROID_ABI: arm64-v8a
 
     steps:
@@ -68,7 +68,7 @@ jobs:
         run: |
           keytool -genkeypair -v \
             -storetype PKCS12 \
-            -keystore "$RUNNER_TEMP/release.jks" \
+            -keystore "$GITHUB_WORKSPACE/release.jks" \
             -storepass loopprofit123 \
             -keypass loopprofit123 \
             -alias loopprofit \
@@ -87,7 +87,7 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           ANDROID_NDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}/ndk/26.3.11579264
-          KEYSTORE_PATH: ${{ runner.temp }}/release.jks
+          KEYSTORE_PATH: ${{ github.workspace }}/release.jks
           KEY_ALIAS: loopprofit
           KEYSTORE_PASS: loopprofit123
           KEY_PASS: loopprofit123
