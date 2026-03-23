@@ -1,0 +1,80 @@
+name: android-apk
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - qt-android-build
+    paths:
+      - '.github/workflows/android-apk.yml'
+      - 'CMakeLists.txt'
+      - 'src/**'
+      - 'qml/**'
+      - 'scripts/**'
+      - 'docs/**'
+      - 'README.md'
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK + platform tools
+        run: |
+          sdkmanager "ndk;26.3.11579264" "platforms;android-34" "build-tools;34.0.0"
+          echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/26.3.11579264" >> "$GITHUB_ENV"
+
+      - name: Install Qt (Android)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          target: 'android'
+          arch: 'android_arm64_v8a'
+          modules: 'qtdeclarative qtshadertools'
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build build-essential qt6-base-dev-tools qt6-declarative-dev-tools
+
+      - name: Debug Qt paths
+        run: |
+          echo "QT_ROOT_DIR=${QT_ROOT_DIR:-}"
+          echo "RUNNER_TEMP=${RUNNER_TEMP}"
+          find "${QT_ROOT_DIR:-/nonexistent}" -maxdepth 5 -type f -name androiddeployqt 2>/dev/null || true
+          find /usr/lib -maxdepth 5 -type f -name androiddeployqt 2>/dev/null || true
+
+      - name: Build APK (unsigned)
+        env:
+          QT_ANDROID_DIR: ${{ env.QT_ROOT_DIR }}/6.5.3/android_arm64_v8a
+          QT_HOST_PATH: /usr/lib/qt6
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          ANDROID_NDK_ROOT: ${{ env.ANDROID_NDK_ROOT }}
+        run: ./scripts/build_android_apk.sh
+
+      - name: Collect APK
+        run: |
+          mkdir -p dist
+          cp build-android/android-build/build/outputs/apk/release/*.apk dist/ || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: loopprofit-qt-apk
+          path: dist/*.apk
+          if-no-files-found: error
