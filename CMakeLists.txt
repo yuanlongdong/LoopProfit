@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
-project(LoopProfit LANGUAGES CXX)
+project(LoopProfit VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Sql Qml Quick Test)
 
@@ -29,6 +30,13 @@ qt_add_qml_module(LoopProfitApp
     QML_FILES
         qml/Main.qml
 )
+
+set_target_properties(LoopProfitApp PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
+)
+
+qt_finalize_executable(LoopProfitApp)
 
 enable_testing()
 
