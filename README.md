@@ -50,3 +50,19 @@ ctest --test-dir build --output-on-failure
 - `notifications`
 
 > 注意：当前收益逻辑为可替换黑箱模拟函数（`LoopEngine::executeBlackBoxProfit`），后续可接入真实 AI 任务执行器。
+
+
+## Android Release APK
+
+如果你遇到“无法生成 release apk”，先看：
+
+- `docs/ANDROID_RELEASE.md`
+
+快速执行：
+
+```bash
+./scripts/check_android_env.sh
+./scripts/build_android_release_apk.sh
+```
+
+> `build_android_release_apk.sh` 依赖签名环境变量 `KEYSTORE_PATH / KEY_ALIAS / KEYSTORE_PASS`。
